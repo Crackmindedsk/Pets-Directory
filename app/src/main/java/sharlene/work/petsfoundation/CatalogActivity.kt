@@ -4,8 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class CatalogActivity : AppCompatActivity() {
 
@@ -13,7 +13,7 @@ class CatalogActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_catalog)
 
-        val fab:FloatingActionButton = findViewById(R.id.fab)
+        val fab:View = findViewById(R.id.fab)
         fab.setOnClickListener{
                 val intent= Intent(this,EditorActivity::class.java)
                 startActivity(intent)
