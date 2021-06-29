@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
+import sharlene.work.petsfoundation.data.PetContract.PetEntry
 
 public class EditorActivity: AppCompatActivity() {
     private var mNameEditText: EditText?=null
@@ -40,11 +41,11 @@ public class EditorActivity: AppCompatActivity() {
                 val selection= parent.getItemAtPosition(position) as String
                 if(!TextUtils.isEmpty(selection)){
                     mGender=if (selection==getString(R.string.gender_male))
-                        1
+                        PetEntry.GENDER_MALE
                     else if(selection==getString(R.string.gender_female))
-                        2
+                        PetEntry.GENDER_FEMALE
                     else
-                        0
+                        PetEntry.GENDER_UNKNOWN
                 }
             }
 
