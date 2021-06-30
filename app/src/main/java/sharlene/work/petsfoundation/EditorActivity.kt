@@ -24,10 +24,10 @@ public class EditorActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
 
-        mNameEditText= findViewById(R.id.edit_pet_name) as EditText
-        mBreedEditText= findViewById(R.id.edit_pet_breed) as EditText
-        mWeightEditText= findViewById(R.id.edit_pet_weight) as EditText
-        mGenderSpinner=findViewById(R.id.spinner_gender) as Spinner
+        mNameEditText= findViewById(R.id.edit_pet_name)
+        mBreedEditText= findViewById<EditText>(R.id.edit_pet_breed)
+        mWeightEditText= findViewById<EditText>(R.id.edit_pet_weight)
+        mGenderSpinner= findViewById<Spinner>(R.id.spinner_gender)
 
         setupSpinner()
     }
