@@ -1,11 +1,16 @@
 package sharlene.work.petsfoundation
 
 import android.content.Intent
+import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import sharlene.work.petsfoundation.data.PetContract
+import sharlene.work.petsfoundation.data.PetDbHelper
 
 class CatalogActivity : AppCompatActivity() {
 
@@ -18,7 +23,17 @@ class CatalogActivity : AppCompatActivity() {
             val intent= Intent(this@CatalogActivity,EditorActivity::class.java)
             startActivity(intent)
         }
-
+        displayDatabaseInfo()
+    }
+    private fun displayDatabaseInfo(){
+        val mDHelper = PetDbHelper(this)
+        val db:SQLiteDatabase=mDHelper.readableDatabase
+        val cursor:Cursor=db.rawQuery("SELECT * FROM " + PetContract.PetEntry.TABLE_NAME,null)
+        cursor.use { cursor ->
+            val displayView:TextView=findViewById(R.id.text_view_pet)
+            displayView.text = "Number of rows in pets database table:" +cursor.count
+        }
+        
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
