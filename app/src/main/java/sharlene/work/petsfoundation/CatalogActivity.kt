@@ -1,5 +1,6 @@
 package sharlene.work.petsfoundation
 
+import android.content.ContentValues
 import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
@@ -13,6 +14,7 @@ import sharlene.work.petsfoundation.data.PetContract
 import sharlene.work.petsfoundation.data.PetDbHelper
 
 class CatalogActivity : AppCompatActivity() {
+    private lateinit var mDHelper:PetDbHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,10 +25,10 @@ class CatalogActivity : AppCompatActivity() {
             val intent= Intent(this@CatalogActivity,EditorActivity::class.java)
             startActivity(intent)
         }
+        mDHelper= PetDbHelper(this)
         displayDatabaseInfo()
     }
     private fun displayDatabaseInfo(){
-        val mDHelper = PetDbHelper(this)
         val db:SQLiteDatabase=mDHelper.readableDatabase
         val cursor:Cursor=db.rawQuery("SELECT * FROM " + PetContract.PetEntry.TABLE_NAME,null)
         cursor.use { cursor ->
@@ -34,6 +36,16 @@ class CatalogActivity : AppCompatActivity() {
             displayView.text = "Number of rows in pets database table:" +cursor.count
         }
         
+    }
+    private fun insertPet(){
+        val db=mDHelper.writableDatabase
+        val values=ContentValues().apply {
+            put(PetContract.PetEntry.COLUMN_PET_NAME,"Toto")
+            put(PetContract.PetEntry.COLUMN_PET_BREED,"Terrier")
+            put(PetContract.PetEntry.COLUMN_PET_GENDER,1)
+            put(PetContract.PetEntry.COLUMN_PET_WEIGHT,7)
+        }
+        val newRowId=db?.insert(PetContract.PetEntry.TABLE_NAME,null,values)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -47,7 +59,11 @@ class CatalogActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when(item.itemId) {
-            R.id.action_insert_dummy_data -> true
+            R.id.action_insert_dummy_data -> {
+                insertPet()
+                displayDatabaseInfo()
+                true
+            }
             R.id.action_delete_all_entries -> true
             else -> super.onOptionsItemSelected(item)
         }
