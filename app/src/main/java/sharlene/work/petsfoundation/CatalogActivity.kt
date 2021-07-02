@@ -36,10 +36,9 @@ class CatalogActivity : AppCompatActivity() {
     }
 
     private fun displayDatabaseInfo(){
-        val db:SQLiteDatabase=mDHelper.readableDatabase
         val projection= arrayOf(BaseColumns._ID,PetContract.PetEntry.COLUMN_PET_NAME, PetContract.PetEntry.COLUMN_PET_BREED, PetContract.PetEntry.COLUMN_PET_GENDER,PetContract.PetEntry.COLUMN_PET_WEIGHT)
-        val cursor=db.query(PetContract.PetEntry.TABLE_NAME,projection,null,null,null,null,null)
-
+//        val cursor=db.query(PetContract.PetEntry.TABLE_NAME,projection,null,null,null,null,null)
+        val cursor=contentResolver.query(  _ ,projection,null,null,null)
         cursor.use { cursor ->
             val displayView:TextView=findViewById(R.id.text_view_pet)
             displayView.text = "The pets table contains ${cursor.count} pets\n\n"
