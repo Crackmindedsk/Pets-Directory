@@ -39,10 +39,27 @@ class CatalogActivity : AppCompatActivity() {
         val db:SQLiteDatabase=mDHelper.readableDatabase
         val projection= arrayOf(BaseColumns._ID,PetContract.PetEntry.COLUMN_PET_NAME, PetContract.PetEntry.COLUMN_PET_BREED, PetContract.PetEntry.COLUMN_PET_GENDER,PetContract.PetEntry.COLUMN_PET_WEIGHT)
         val cursor=db.query(PetContract.PetEntry.TABLE_NAME,projection,null,null,null,null,null)
+
         cursor.use { cursor ->
             val displayView:TextView=findViewById(R.id.text_view_pet)
-            displayView.text = "Number of rows in pets database table:" +cursor.count
+            displayView.text = "The pets table contains ${cursor.count} pets\n\n"
+            displayView.append("${PetContract.PetEntry._ID} - ${PetContract.PetEntry.COLUMN_PET_NAME} - ${PetContract.PetEntry.COLUMN_PET_BREED} - ${PetContract.PetEntry.COLUMN_PET_GENDER} - ${PetContract.PetEntry.COLUMN_PET_WEIGHT}\n")
+
+            val idColumnIndex=cursor.getColumnIndex(PetContract.PetEntry._ID)
+            val nameColumnIndex=cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_NAME)
+            val breedColumnIndex=cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_BREED)
+            val genderColumnIndex=cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_GENDER)
+            val weightColumnIndex=cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_WEIGHT)
+            while (cursor.moveToNext()){
+                val curentID=cursor.getInt(idColumnIndex)
+                val currentname=cursor.getString(nameColumnIndex)
+                val currentbreed=cursor.getString(breedColumnIndex)
+                val currentgender=cursor.getInt(genderColumnIndex)
+                val currentweight=cursor.getInt(weightColumnIndex)
+                displayView.append("\n $curentID - $currentname - $currentbreed - $currentgender - $currentweight")
+            }
         }
+        cursor.close()
         
     }
     private fun insertPet(){
