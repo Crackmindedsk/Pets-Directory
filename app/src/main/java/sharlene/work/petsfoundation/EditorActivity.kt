@@ -1,17 +1,16 @@
 package sharlene.work.petsfoundation
 
+import android.content.ContentValues
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
 import sharlene.work.petsfoundation.data.PetContract.PetEntry
+import sharlene.work.petsfoundation.data.PetDbHelper
 
 public class EditorActivity: AppCompatActivity() {
     private var mNameEditText: EditText?=null
@@ -30,6 +29,28 @@ public class EditorActivity: AppCompatActivity() {
         mGenderSpinner= findViewById<Spinner>(R.id.spinner_gender)
 
         setupSpinner()
+    }
+    private fun insertPet(){
+        val nameString=mNameEditText?.text.toString().trim()
+        val breedName=mBreedEditText?.text.toString().trim()
+        val weightString=mWeightEditText?.text.toString().trim()
+        val weight=Integer.parseInt(weightString)
+
+        val mDHelper= PetDbHelper(this)
+        val db=mDHelper.writableDatabase
+        val values=ContentValues().apply {
+            put(PetEntry.COLUMN_PET_NAME,nameString)
+            put(PetEntry.COLUMN_PET_BREED,breedName)
+            put(PetEntry.COLUMN_PET_GENDER,mGender)
+            put(PetEntry.COLUMN_PET_WEIGHT,weight)
+        }
+        val newRowId=db.insert(PetEntry.TABLE_NAME,null,values)
+
+        if(newRowId == -1L){
+            Toast.makeText(this, "Error with saving pet", Toast.LENGTH_SHORT).show()
+        }else{
+            Toast.makeText(this, "Pet saved with row is: $newRowId", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupSpinner() {
@@ -62,7 +83,11 @@ public class EditorActivity: AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return  when(item.itemId){
-            R.id.action_save->true
+            R.id.action_save->{
+                insertPet()
+                finish()
+                true
+            }
             R.id.action_delete->true
             android.R.id.home->{
                 NavUtils.navigateUpFromSameTask(this)

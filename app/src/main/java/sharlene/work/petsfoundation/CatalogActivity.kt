@@ -2,9 +2,10 @@ package sharlene.work.petsfoundation
 
 import android.content.ContentValues
 import android.content.Intent
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
+import android.provider.BaseColumns
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
@@ -28,9 +29,16 @@ class CatalogActivity : AppCompatActivity() {
         mDHelper= PetDbHelper(this)
         displayDatabaseInfo()
     }
+
+    override fun onStart() {
+        super.onStart()
+        displayDatabaseInfo()
+    }
+
     private fun displayDatabaseInfo(){
         val db:SQLiteDatabase=mDHelper.readableDatabase
-        val cursor:Cursor=db.rawQuery("SELECT * FROM " + PetContract.PetEntry.TABLE_NAME,null)
+        val projection= arrayOf(BaseColumns._ID,PetContract.PetEntry.COLUMN_PET_NAME, PetContract.PetEntry.COLUMN_PET_BREED, PetContract.PetEntry.COLUMN_PET_GENDER,PetContract.PetEntry.COLUMN_PET_WEIGHT)
+        val cursor=db.query(PetContract.PetEntry.TABLE_NAME,projection,null,null,null,null,null)
         cursor.use { cursor ->
             val displayView:TextView=findViewById(R.id.text_view_pet)
             displayView.text = "Number of rows in pets database table:" +cursor.count
@@ -42,10 +50,11 @@ class CatalogActivity : AppCompatActivity() {
         val values=ContentValues().apply {
             put(PetContract.PetEntry.COLUMN_PET_NAME,"Toto")
             put(PetContract.PetEntry.COLUMN_PET_BREED,"Terrier")
-            put(PetContract.PetEntry.COLUMN_PET_GENDER,1)
+            put(PetContract.PetEntry.COLUMN_PET_GENDER,PetContract.PetEntry.GENDER_MALE)
             put(PetContract.PetEntry.COLUMN_PET_WEIGHT,7)
         }
         val newRowId=db?.insert(PetContract.PetEntry.TABLE_NAME,null,values)
+        Log.d("CatalogActivity","New Row Id $newRowId")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
