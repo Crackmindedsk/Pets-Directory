@@ -1,11 +1,13 @@
-package sharlene.work.petsfoundation.data
+package sharlene. work.petsfoundation.data
 
 import android.content.ContentProvider
 import android.content.ContentUris
+import android.content.ContentUris.*
 import android.content.ContentValues
 import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
+import android.text.Selection
 import android.util.Log
 
 private val sUriMatcher=UriMatcher(UriMatcher.NO_MATCH).apply {
@@ -44,7 +46,7 @@ class PetProvider: ContentProvider() {
             }
             2->{
                 val selection=PetContract.PetEntry._ID+"=?"
-                val selectionArgs= (ContentUris.parseId(uri)).toString()
+                val selectionArgs= (parseId(uri)).toString()
                 cursor=db.query(PetContract.PetEntry.TABLE_NAME,projection,selection,
                     arrayOf(selectionArgs),null,null,null)
             }
@@ -65,6 +67,22 @@ class PetProvider: ContentProvider() {
         }
     }
     private fun insertPet(uri:Uri, values: ContentValues?): Uri? {
+        val name= values?.getAsString(PetContract.PetEntry.COLUMN_PET_NAME)
+        if (name==null)
+            throw IllegalArgumentException("Pet requires a name")
+
+        val breed=values.getAsString(PetContract.PetEntry.COLUMN_PET_BREED)
+        if(breed==null)
+            throw IllegalArgumentException("Pet requires a breed name")
+
+        val gender=values.getAsInteger(PetContract.PetEntry.COLUMN_PET_GENDER)
+        if(gender==null ||!PetContract.PetEntry.isValidGender(gender))
+            throw IllegalArgumentException("Pet requires a gender")
+
+        val weight=values.getAsInteger(PetContract.PetEntry.COLUMN_PET_WEIGHT)
+        if(weight!=null && weight<0)
+            throw IllegalArgumentException("Pet requires a weight")
+
         val db=mDbHelper.writableDatabase
 
         val newRowId=db.insert(PetContract.PetEntry.TABLE_NAME,null,values)
@@ -72,17 +90,60 @@ class PetProvider: ContentProvider() {
             Log.d("PetProvider","Failed to insert row for $uri")
             return null
         }
-        return ContentUris.withAppendedId(uri,newRowId)
+        return withAppendedId(uri,newRowId)
     }
 
     override fun delete(uri: Uri, s: String?, strings: Array<out String>?): Int {
-        return 0
+        val db=mDbHelper.writableDatabase
+        val match= sUriMatcher.match(uri)
+        when(match){
+            1->return db.delete(PetContract.PetEntry.TABLE_NAME,s,strings)
+            2->{
+                s=PetContract.PetEntry._ID+"=?"
+                strings= parseId(uri)
+                return db.delete(PetContract.PetEntry.TABLE_NAME,s,strings)
+            }
+            else->throw IllegalArgumentException("Deletion is not supported for $uri")
+        }
     }
 
     override fun update(uri: Uri, values: ContentValues?, s: String?, strings: Array<out String>?): Int {
-        return 0
+        val match= sUriMatcher.match(uri)
+        when(match){
+            1->return updatePet(uri,values,s,strings)
+            2->{
+                s=PetContract.PetEntry._ID+"=?"
+                strings= parseId(uri)
+                return updatePet(uri,values,s,strings)
+            }
+            else-> throw IllegalArgumentException("Update is not supported for $uri")
+        }
     }
+    private fun updatePet(uri: Uri,values: ContentValues,selection: String,selectionArgs:Array<out String>){
+        if(values.containsKey(PetContract.PetEntry.COLUMN_PET_NAME)){
+            val name=values.getAsString(PetContract.PetEntry.COLUMN_PET_NAME)
+            if (name==null)
+                throw IllegalArgumentException("Pet requires a name")
+        }
 
+        if(values.containsKey(PetContract.PetEntry.COLUMN_PET_GENDER)){
+            val gender=values.getAsInteger(PetContract.PetEntry.COLUMN_PET_GENDER)
+            if (gender==null || !PetContract.PetEntry.isValidGender())
+                throw IllegalArgumentException("Pet requires valid gender")
+        }
+
+        if (values.containsKey(PetContract.PetEntry.COLUMN_PET_WEIGHT)){
+            val weight=values.getAsInteger(PetContract.PetEntry.COLUMN_PET_WEIGHT)
+            if(weight!=null && weight<0)
+                throw IllegalArgumentException("Pet requires valid weight")
+        }
+
+        if (values.size() ==0){
+            return
+        }
+        val db=mDbHelper.writableDatabase
+        return db.update(PetContract.PetEntry.TABLE_NAME,values,selection,selectionArgs)
+    }
 
 
 }

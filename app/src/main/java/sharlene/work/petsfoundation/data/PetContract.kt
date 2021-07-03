@@ -21,5 +21,11 @@ object PetContract {
         const val GENDER_UNKNOWN=0
         const val GENDER_MALE=1
         const val GENDER_FEMALE=2
+
+        public fun isValidGender(gender:Int):Boolean{
+            if(gender== GENDER_UNKNOWN || gender== GENDER_FEMALE||gender== GENDER_MALE)
+            {   return true}
+            return false
+        }
     }
 }
