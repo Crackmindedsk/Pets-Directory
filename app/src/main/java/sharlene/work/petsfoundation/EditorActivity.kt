@@ -1,7 +1,6 @@
 package sharlene.work.petsfoundation
 
 import android.content.ContentValues
-import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
@@ -17,7 +16,7 @@ public class EditorActivity: AppCompatActivity() {
     private var mBreedEditText: EditText?=null
     private var mWeightEditText: EditText?=null
     private var mGenderSpinner: Spinner?=null
-    private var mGender=0
+    private var mGender=PetEntry.GENDER_UNKNOWN
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,10 +30,10 @@ public class EditorActivity: AppCompatActivity() {
         setupSpinner()
     }
     private fun insertPet(){
-        val nameString=mNameEditText?.text.toString().trim()
-        val breedName=mBreedEditText?.text.toString().trim()
-        val weightString=mWeightEditText?.text.toString().trim()
-        val weight=Integer.parseInt(weightString)
+        val nameString=mNameEditText!!.text.toString().trim()
+        val breedName=mBreedEditText!!.text.toString().trim()
+        val weightString=mWeightEditText!!.text.toString().trim()
+        val weight=weightString.toInt()
 
         val values=ContentValues().apply {
             put(PetEntry.COLUMN_PET_NAME,nameString)
@@ -42,7 +41,7 @@ public class EditorActivity: AppCompatActivity() {
             put(PetEntry.COLUMN_PET_GENDER,mGender)
             put(PetEntry.COLUMN_PET_WEIGHT,weight)
         }
-        val newUri:Uri?=contentResolver.insert(PetEntry.CONTENT_URI,values)
+        val newUri=contentResolver.insert(PetEntry.CONTENT_URI,values)
 
         if(newUri == null){
             Toast.makeText(this, "Error with saving pet", Toast.LENGTH_SHORT).show()
@@ -59,17 +58,16 @@ public class EditorActivity: AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>, view : View, position: Int, id: Long) {
                 val selection= parent.getItemAtPosition(position) as String
                 if(!TextUtils.isEmpty(selection)){
-                    mGender=if (selection==getString(R.string.gender_male))
-                        PetEntry.GENDER_MALE
-                    else if(selection==getString(R.string.gender_female))
-                        PetEntry.GENDER_FEMALE
-                    else
-                        PetEntry.GENDER_UNKNOWN
+                    mGender= when (selection) {
+                        getString(R.string.gender_male) -> PetEntry.GENDER_MALE
+                        getString(R.string.gender_female) -> PetEntry.GENDER_FEMALE
+                        else -> PetEntry.GENDER_UNKNOWN
+                    }
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                mGender=0
+                mGender=PetEntry.GENDER_UNKNOWN
             }
         }
     }
@@ -80,19 +78,19 @@ public class EditorActivity: AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return  when(item.itemId){
+        when(item.itemId){
             R.id.action_save->{
                 insertPet()
                 finish()
-                true
+                return true
             }
-            R.id.action_delete->true
+            R.id.action_delete->return true
             android.R.id.home->{
                 NavUtils.navigateUpFromSameTask(this)
                 return true
             }
-            else->super.onOptionsItemSelected(item)
         }
+        return super.onOptionsItemSelected(item)
     }
 
 }

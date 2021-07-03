@@ -12,11 +12,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import sharlene.work.petsfoundation.data.PetContract
-import sharlene.work.petsfoundation.data.PetDbHelper
 
 class CatalogActivity : AppCompatActivity() {
-    private lateinit var mDHelper:PetDbHelper
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_catalog)
@@ -26,8 +23,8 @@ class CatalogActivity : AppCompatActivity() {
             val intent= Intent(this@CatalogActivity,EditorActivity::class.java)
             startActivity(intent)
         }
-        mDHelper= PetDbHelper(this)
-        displayDatabaseInfo()
+//        mDHelper= PetDbHelper(this)
+//        displayDatabaseInfo()
     }
 
     override fun onStart() {
@@ -82,14 +79,14 @@ class CatalogActivity : AppCompatActivity() {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        return when(item.itemId) {
+        when(item.itemId) {
             R.id.action_insert_dummy_data -> {
                 insertPet()
                 displayDatabaseInfo()
-                true
+                return true
             }
-            R.id.action_delete_all_entries -> true
-            else -> super.onOptionsItemSelected(item)
+            R.id.action_delete_all_entries -> return true
         }
+        return super.onOptionsItemSelected(item)
     }
 }
