@@ -1,5 +1,6 @@
 package sharlene.work.petsfoundation.data
 
+import android.content.ContentResolver
 import android.net.Uri
 import android.provider.BaseColumns
 
@@ -11,6 +12,8 @@ object PetContract {
 
     object PetEntry:BaseColumns{
         public val CONTENT_URI:Uri= Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PETS)
+        val CONTENT_LIST_TYPE=ContentResolver.CURSOR_DIR_BASE_TYPE+"/"+ CONTENT_AUTHORITY+"/"+ PATH_PETS
+        val CONTENT_ITEM_TYPE=ContentResolver.CURSOR_ITEM_BASE_TYPE+"/"+ CONTENT_AUTHORITY+"/"+ PATH_PETS
         const val TABLE_NAME="pets"
         const val _ID=BaseColumns._ID
         const val COLUMN_PET_NAME="name"

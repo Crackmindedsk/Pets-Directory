@@ -52,12 +52,12 @@ class CatalogActivity : AppCompatActivity() {
             val weightColumnIndex=cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_WEIGHT)
 
             while (cursor.moveToNext()){
-                val curentID= cursor.getInt(idColumnIndex)
+                val currentID= cursor.getInt(idColumnIndex)
                 val currentname=cursor.getString(nameColumnIndex)
                 val currentbreed=cursor.getString(breedColumnIndex)
                 val currentgender=cursor.getInt(genderColumnIndex)
                 val currentweight=cursor.getInt(weightColumnIndex)
-                displayView.append("\n $curentID - $currentname - $currentbreed - $currentgender - $currentweight")
+                displayView.append("\n $currentID - $currentname - $currentbreed - $currentgender - $currentweight")
             }
         }
         
