@@ -1,6 +1,7 @@
 package sharlene.work.petsfoundation
 
 import android.content.ContentValues
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
@@ -10,7 +11,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
 import sharlene.work.petsfoundation.data.PetContract.PetEntry
-import sharlene.work.petsfoundation.data.PetDbHelper
 
 public class EditorActivity: AppCompatActivity() {
     private var mNameEditText: EditText?=null
@@ -36,20 +36,18 @@ public class EditorActivity: AppCompatActivity() {
         val weightString=mWeightEditText?.text.toString().trim()
         val weight=Integer.parseInt(weightString)
 
-        val mDHelper= PetDbHelper(this)
-        val db=mDHelper.writableDatabase
         val values=ContentValues().apply {
             put(PetEntry.COLUMN_PET_NAME,nameString)
             put(PetEntry.COLUMN_PET_BREED,breedName)
             put(PetEntry.COLUMN_PET_GENDER,mGender)
             put(PetEntry.COLUMN_PET_WEIGHT,weight)
         }
-        val newRowId=db.insert(PetEntry.TABLE_NAME,null,values)
+        val newUri:Uri?=contentResolver.insert(PetEntry.CONTENT_URI,values)
 
-        if(newRowId == -1L){
+        if(newUri == null){
             Toast.makeText(this, "Error with saving pet", Toast.LENGTH_SHORT).show()
         }else{
-            Toast.makeText(this, "Pet saved with row is: $newRowId", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Pet saved with row is: $newUri", Toast.LENGTH_SHORT).show()
         }
     }
 

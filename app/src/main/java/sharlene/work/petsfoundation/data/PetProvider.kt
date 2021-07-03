@@ -6,6 +6,7 @@ import android.content.ContentValues
 import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
+import android.util.Log
 
 private val sUriMatcher=UriMatcher(UriMatcher.NO_MATCH).apply {
     addURI(PetContract.CONTENT_AUTHORITY,PetContract.PATH_PETS,1)
@@ -57,7 +58,21 @@ class PetProvider: ContentProvider() {
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        return null
+        val match = sUriMatcher.match(uri)
+        when(match){
+            1-> return insertPet(uri,values)
+            else->throw IllegalArgumentException("Insertion is not supported for $uri")
+        }
+    }
+    private fun insertPet(uri:Uri, values: ContentValues?): Uri? {
+        val db=mDbHelper.writableDatabase
+
+        val newRowId=db.insert(PetContract.PetEntry.TABLE_NAME,null,values)
+        if(newRowId==-1L){
+            Log.d("PetProvider","Failed to insert row for $uri")
+            return null
+        }
+        return ContentUris.withAppendedId(uri,newRowId)
     }
 
     override fun delete(uri: Uri, s: String?, strings: Array<out String>?): Int {
