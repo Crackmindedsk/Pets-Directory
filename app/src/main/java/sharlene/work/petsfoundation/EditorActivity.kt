@@ -1,22 +1,36 @@
 package sharlene.work.petsfoundation
 
 import android.content.ContentValues
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.Loader
 import sharlene.work.petsfoundation.data.PetContract.PetEntry
 
-public class EditorActivity: AppCompatActivity() {
+public class EditorActivity: AppCompatActivity(),
+LoaderManager.LoaderCallbacks<Cursor>{
+    private val mCurrentPetUri:Uri?=null
     private var mNameEditText: EditText?=null
     private var mBreedEditText: EditText?=null
     private var mWeightEditText: EditText?=null
     private var mGenderSpinner: Spinner?=null
     private var mGender=PetEntry.GENDER_UNKNOWN
+    private val mPetHasChanged=false
+
+    private fun mTouchListener():View.OnTouchListener{
+        override fun onTouchEvent(event: MotionEvent?): Boolean {
+            return super.onTouchEvent(event)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +105,22 @@ public class EditorActivity: AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        private const val EXISTING_PET_LOADER=0
+    }
+
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+        TODO("Not yet implemented")
+    }
+
+    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onLoaderReset(loader: Loader<Cursor>) {
+        TODO("Not yet implemented")
     }
 
 }

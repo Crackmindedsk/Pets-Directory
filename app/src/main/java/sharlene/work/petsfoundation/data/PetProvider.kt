@@ -7,6 +7,8 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
+import sharlene.work.petsfoundation.data.PetContract
+import sharlene.work.petsfoundation.data.PetDbHelper
 
 
 class PetProvider: ContentProvider() {
@@ -23,7 +25,7 @@ class PetProvider: ContentProvider() {
 //        const val PATH_PETS="pets"
 //        final val CONTENT_URI:Uri= Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PETS)
 //    }
-    private var mDbHelper:PetDbHelper?=null
+    private var mDbHelper: PetDbHelper?=null
 
     override fun onCreate(): Boolean {
         mDbHelper=PetDbHelper(context)
@@ -56,6 +58,7 @@ class PetProvider: ContentProvider() {
             }
             else->throw IllegalArgumentException("Cannot query unknown URI $uri")
         }
+        cursor.setNotificationUri(context?.contentResolver,uri)
         return cursor
     }
 
@@ -93,6 +96,7 @@ class PetProvider: ContentProvider() {
             Log.d("PetProvider","Failed to insert row for $uri")
             return null
         }
+        context?.contentResolver?.notifyChange(uri,null)
         return ContentUris.withAppendedId(uri,newRowId)
     }
 
@@ -101,15 +105,27 @@ class PetProvider: ContentProvider() {
         var selectionArgs: Array<out String>? =selectionArgs
         val db= mDbHelper!!.writableDatabase
         val match= sUriMatcher.match(uri)
-        return when(match){
-            1-> db.delete(PetContract.PetEntry.TABLE_NAME,selection,selectionArgs)
+        var rowsDeleted:Int
+        when(match){
+            1->{
+                rowsDeleted=db.delete(PetContract.PetEntry.TABLE_NAME,selection,selectionArgs)
+                if (rowsDeleted!=0) {
+                    context?.contentResolver?.notifyChange(uri, null)
+                }
+                return rowsDeleted
+            }
             2->{
                 selection=PetContract.PetEntry._ID+"=?"
                 selectionArgs= arrayOf(ContentUris.parseId(uri).toString())
-                db.delete(PetContract.PetEntry.TABLE_NAME,selection,selectionArgs)
+                rowsDeleted=db.delete(PetContract.PetEntry.TABLE_NAME,selection,selectionArgs)
+                if (rowsDeleted!=0) {
+                    context?.contentResolver?.notifyChange(uri, null)
+                }
+                return rowsDeleted
             }
             else->throw IllegalArgumentException("Deletion is not supported for $uri")
         }
+
     }
 
 
@@ -138,7 +154,7 @@ class PetProvider: ContentProvider() {
                 ?: throw IllegalArgumentException("Pet requires a name")
         }
 
-        if(values!!.containsKey(PetContract.PetEntry.COLUMN_PET_GENDER)){
+        if(values.containsKey(PetContract.PetEntry.COLUMN_PET_GENDER)){
             val gender=values.getAsInteger(PetContract.PetEntry.COLUMN_PET_GENDER)
             if (gender==null || !PetContract.PetEntry.isValidGender(gender))
                 throw IllegalArgumentException("Pet requires valid gender")
@@ -154,7 +170,11 @@ class PetProvider: ContentProvider() {
             return 0
         }
         val db= mDbHelper!!.writableDatabase
-        return db.update(PetContract.PetEntry.TABLE_NAME,values,selection,selectionArgs)
+        val rowUpdated= db.update(PetContract.PetEntry.TABLE_NAME,values,selection,selectionArgs)
+        if (rowUpdated!=0){
+            context?.contentResolver?.notifyChange(uri,null)
+        }
+        return rowUpdated
     }
 
 
