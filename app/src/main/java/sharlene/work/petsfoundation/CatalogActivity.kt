@@ -1,13 +1,12 @@
 package sharlene.work.petsfoundation
 
-import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.BaseColumns
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -25,6 +24,9 @@ class CatalogActivity : AppCompatActivity() {
         }
 //        mDHelper= PetDbHelper(this)
 //        displayDatabaseInfo()
+        val petListView:ListView=findViewById(R.id.list)
+        val emptyView:View=findViewById(R.id.empty_view)
+        petListView.emptyView=emptyView
     }
 
     override fun onStart() {
@@ -41,7 +43,6 @@ class CatalogActivity : AppCompatActivity() {
         val adapter=PetCursorAdapter(this,cursor)
         displayView.adapter = adapter
 
-        }
         
     }
     private fun insertPet(){
