@@ -13,6 +13,7 @@
     <string name="action_insert_dummy_data">Insert Dummy Data</string>
     <string name="action_delete_all_entries">Delete All Pets</string>
     <string name="editor_activity_title_new_pet">Add a Pet</string>
+    <string name="editor_activity_title_edit_pet">Edit Pet</string>
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
     <string name="category_overview">Overview</string>

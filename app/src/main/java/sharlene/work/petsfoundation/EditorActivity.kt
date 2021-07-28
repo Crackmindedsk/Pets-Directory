@@ -1,6 +1,7 @@
-package sharlene.work.petsfoundation
+package sharlene.work. petsfoundation
 
 import android.content.ContentValues
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
@@ -13,18 +14,19 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
 import androidx.loader.app.LoaderManager
+import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import sharlene.work.petsfoundation.data.PetContract.PetEntry
 
 public class EditorActivity: AppCompatActivity(),
-LoaderManager.LoaderCallbacks<Cursor>{
-    private val mCurrentPetUri:Uri?=null
+LoaderManager.LoaderCallbacks<Cursor>, android.app.LoaderManager.LoaderCallbacks<Any> {
     private var mNameEditText: EditText?=null
     private var mBreedEditText: EditText?=null
     private var mWeightEditText: EditText?=null
     private var mGenderSpinner: Spinner?=null
     private var mGender=PetEntry.GENDER_UNKNOWN
     private val mPetHasChanged=false
+    private val mCurrentPetUri:Uri ?=null
 
     private fun mTouchListener():View.OnTouchListener{
         override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -36,12 +38,21 @@ LoaderManager.LoaderCallbacks<Cursor>{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
 
+        val intent:Intent=getIntent()
+        val currentPetUri:Uri?=intent.data
+        if(currentPetUri==null){
+            title =getString(R.string.editor_activity_title_new_pet)
+        }else{
+            title=getString(R.string.editor_activity_title_edit_pet)
+        }
+
         mNameEditText= findViewById(R.id.edit_pet_name)
         mBreedEditText= findViewById<EditText>(R.id.edit_pet_breed)
         mWeightEditText= findViewById<EditText>(R.id.edit_pet_weight)
         mGenderSpinner= findViewById<Spinner>(R.id.spinner_gender)
 
         setupSpinner()
+        loaderManager.initLoader(EXISTING_PET_LOADER,null,this)
     }
     private fun insertPet(){
         val nameString=mNameEditText!!.text.toString().trim()
@@ -112,11 +123,33 @@ LoaderManager.LoaderCallbacks<Cursor>{
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-        TODO("Not yet implemented")
+        val projection={
+            PetEntry._ID,
+            PetEntry.COLUMN_PET_NAME,
+            PetEntry.COLUMN_PET_BREED,
+            PetEntry.COLUMN_PET_GENDER,
+            PetEntry.COLUMN_PET_WEIGHT
+        }
+        return CursorLoader(this, mCurrentPetUri!!,projection,null,null,null)
     }
 
-    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-        TODO("Not yet implemented")
+    override fun onLoadFinished(loader: Loader<Cursor>, cursor: Cursor?) {
+        if(cursor.moveToFirst()){
+            val nameColumnIndex= cursor?.getColumnIndex(PetEntry.COLUMN_PET_NAME)
+            val breedColumnIndex= cursor?.getColumnIndex(PetEntry.COLUMN_PET_BREED)
+            val genderColumnIndex= cursor?.getColumnIndex(PetEntry.COLUMN_PET_GENDER)
+            val weightColumnIndex= cursor?.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT)
+
+            val name= cursor?.getString(nameColumnIndex!!)
+            val breed= cursor?.getString(breedColumnIndex!!)
+            val gender= cursor?.getInt(genderColumnIndex!!)
+            val weight= cursor?.getInt(weightColumnIndex!!)
+
+            mNameEditText!!.text=name
+            mBreedEditText.text=breed
+            mWeightEditText.text=Int.toString(weight)
+
+        }
     }
 
     override fun onLoaderReset(loader: Loader<Cursor>) {

@@ -40,6 +40,7 @@ class CatalogActivity : AppCompatActivity(),
         petListView.emptyView=emptyView
         mCursorAdapter= PetCursorAdapter(this,null)
         petListView.adapter=mCursorAdapter
+
         petListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
             val intent=Intent(this@CatalogActivity,EditorActivity::class.java)
             val currentPetUri=ContentUris.withAppendedId(PetContract.PetEntry.CONTENT_URI,id)
