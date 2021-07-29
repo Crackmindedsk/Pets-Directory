@@ -42,6 +42,8 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
 
         if(mCurrentPetUri==null){
             title =getString(R.string.editor_activity_title_new_pet)
+
+            invalidateOptionsMenu()
         }else{
             title=getString(R.string.editor_activity_title_edit_pet)
             loaderManager.initLoader(EXISTING_PET_LOADER,null,this)
@@ -151,6 +153,15 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
 
     companion object {
         private const val EXISTING_PET_LOADER=0
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        super.onPrepareOptionsMenu(menu)
+        if (mCurrentPetUri==null){
+            val menuItem= menu?.findItem(R.id.action_delete)
+            menuItem.setVisible(false)
+        }
+        return true
     }
 
     override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<Cursor?> {
