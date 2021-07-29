@@ -46,7 +46,7 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
             invalidateOptionsMenu()
         }else{
             title=getString(R.string.editor_activity_title_edit_pet)
-            loaderManager.initLoader(EXISTING_PET_LOADER,null,this)
+//            loaderManager.initLoader(EXISTING_PET_LOADER,null,this)
         }
 
         mNameEditText= findViewById(R.id.edit_pet_name)
@@ -90,7 +90,7 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
             }
 
         }else{
-            val rowsAffected:Int=contentResolver.update(mCurrentPetUri,values,null,null)
+            val rowsAffected:Int=contentResolver.update(mCurrentPetUri!!,values,null,null)
             if(rowsAffected==0){
                 Toast.makeText(this,getString(R.string.editor_update_pet_failed),Toast.LENGTH_SHORT).show()
             }else{
@@ -162,7 +162,7 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
         super.onPrepareOptionsMenu(menu)
         if (mCurrentPetUri==null){
             val menuItem= menu?.findItem(R.id.action_delete)
-            menuItem.setVisible(false)
+            menuItem?.setVisible(false)
         }
         return true
     }
@@ -202,7 +202,11 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
     }
 
     override fun onLoaderReset(loader: Loader<Cursor?>) {
-        TODO("Not yet implemented")
+        mNameEditText!!.setText("")
+        mBreedEditText!!.setText("")
+        mWeightEditText!!.setText("")
+        mGenderSpinner!!.setSelection(0)
+
     }
     private fun showUnsavedChangesDialog(discardButtonClickListener:DialogInterface.OnClickListener){
         val builder:AlertDialog.Builder=AlertDialog.Builder(this)

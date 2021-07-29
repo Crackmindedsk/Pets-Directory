@@ -1,14 +1,11 @@
 package sharlene.work.petsfoundation
 
-import android.content.ContentUris
-import android.content.ContentValues
-import android.content.Intent
+import android.content.*
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.content.*
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
@@ -47,7 +44,7 @@ class CatalogActivity : AppCompatActivity(),
             intent.data=currentPetUri
             startActivity(intent)
         }
-        loaderManager.initLoader(PET_LOADER_,null,this)
+//        loaderManager.initLoader(PET_LOADER_,null,this)
 
     }
 

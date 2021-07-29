@@ -2,6 +2,7 @@ package sharlene.work.petsfoundation
 
 import android.content.Context
 import android.database.Cursor
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +23,11 @@ class PetCursorAdapter(context: Context?, c: Cursor?) : CursorAdapter(context,c,
         val breedColumnIndex= c.getColumnIndex(PetContract.PetEntry.COLUMN_PET_BREED)
 
         val petName= c.getString(nameColumnIndex)
-        val breedName= c.getString(breedColumnIndex)
+        var breedName= c.getString(breedColumnIndex)
+
+        if(TextUtils.isEmpty(breedName)){
+            breedName=context.getString(R.string.unknown_breed)
+        }
 
         title.text = petName
         breedTitle.text = breedName
