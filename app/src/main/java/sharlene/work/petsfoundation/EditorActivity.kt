@@ -135,7 +135,10 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
                 finish()
                 return true
             }
-            R.id.action_delete->return true
+            R.id.action_delete->{
+                showDeleteConfirmationDialog()
+                return true
+            }
             android.R.id.home->{
                 if(!mPetHasChanged){
                     NavUtils.navigateUpFromSameTask(this)
@@ -222,6 +225,34 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
             finish()
         }
         showUnsavedChangesDialog(discardButtonClickListener)
+    }
+
+    private fun showDeleteConfirmationDialog(){
+        val builder=AlertDialog.Builder(this)
+        builder.setMessage(R.string.delete_dialog_msg)
+        builder.setPositiveButton(R.string.delete,DialogInterface.OnClickListener { dialogInterface, i ->
+            deletePet()
+        })
+        builder.setNegativeButton(R.string.cancel,DialogInterface.OnClickListener { dialogInterface, i ->
+            dialogInterface?.dismiss()
+        })
+        val alertDialog=builder.create()
+        alertDialog.show()
+    }
+    private fun deletePet(){
+        if (mCurrentPetUri!=null){
+            val rowsDeleted=contentResolver.delete(mCurrentPetUri!!,null,null)
+            if(rowsDeleted==0){
+                Toast.makeText(this,getString(R.string.editor_delete_pet_failed),Toast.LENGTH_SHORT).show()
+            }else {
+                Toast.makeText(
+                    this,
+                    getString(R.string.editor_delte_pet_successful),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+        finish()
     }
 
 
