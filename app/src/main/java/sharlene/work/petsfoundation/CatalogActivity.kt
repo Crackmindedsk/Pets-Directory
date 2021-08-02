@@ -17,8 +17,7 @@ import androidx.loader.content.Loader
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import sharlene.work.petsfoundation.data.PetContract
 
-class CatalogActivity : AppCompatActivity(),
-    LoaderManager.LoaderCallbacks<Cursor> {
+class CatalogActivity : AppCompatActivity(),LoaderManager.LoaderCallbacks<Cursor?>{
 
     var mCursorAdapter:PetCursorAdapter?=null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,20 +40,19 @@ class CatalogActivity : AppCompatActivity(),
         petListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
             val intent=Intent(this@CatalogActivity,EditorActivity::class.java)
             val currentPetUri=ContentUris.withAppendedId(PetContract.PetEntry.CONTENT_URI,id)
-            intent.data=currentPetUri
+            intent.setData(currentPetUri)
             startActivity(intent)
         }
-//        loaderManager.initLoader(PET_LOADER_,null,this)
+        supportLoaderManager.initLoader(PET_LOADER_,null,this)
 
     }
 
     private fun insertPet(){
-        val values= ContentValues().apply {
-            put(PetContract.PetEntry.COLUMN_PET_NAME,"Toto")
-            put(PetContract.PetEntry.COLUMN_PET_BREED,"Terrier")
-            put(PetContract.PetEntry.COLUMN_PET_GENDER,PetContract.PetEntry.GENDER_MALE)
-            put(PetContract.PetEntry.COLUMN_PET_WEIGHT,7)
-        }
+        val values= ContentValues()
+            values.put(PetContract.PetEntry.COLUMN_PET_NAME,"Toto")
+            values.put(PetContract.PetEntry.COLUMN_PET_BREED,"Terrier")
+            values.put(PetContract.PetEntry.COLUMN_PET_GENDER,PetContract.PetEntry.GENDER_MALE)
+            values.put(PetContract.PetEntry.COLUMN_PET_WEIGHT,7)
         val newUri: Uri? =contentResolver.insert(PetContract.PetEntry.CONTENT_URI,values)
 
     }
@@ -87,17 +85,17 @@ class CatalogActivity : AppCompatActivity(),
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor?> {
         val projection= arrayOf(PetContract.PetEntry._ID,PetContract.PetEntry.COLUMN_PET_NAME,PetContract.PetEntry.COLUMN_PET_BREED)
         return CursorLoader(this,PetContract.PetEntry.CONTENT_URI,projection,null,null,null)
     }
 
-    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-        mCursorAdapter!!.swapCursor(data)
+    override fun onLoadFinished(loader: Loader<Cursor?>, data: Cursor?) {
+        mCursorAdapter?.swapCursor(data)
     }
 
-    override fun onLoaderReset(loader: Loader<Cursor>) {
-        mCursorAdapter!!.swapCursor(null)
+    override fun onLoaderReset(loader: Loader<Cursor?>) {
+        mCursorAdapter?.swapCursor(null)
     }
 
     companion object {
@@ -105,4 +103,5 @@ class CatalogActivity : AppCompatActivity(),
     }
 
 }
+
 

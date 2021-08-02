@@ -20,6 +20,10 @@ import androidx.loader.content.Loader
 import sharlene.work.petsfoundation.data.PetContract.PetEntry
 
 public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor?>{
+    companion object {
+        private const val EXISTING_PET_LOADER=0
+    }
+
     private var mNameEditText: EditText?=null
     private var mBreedEditText: EditText?=null
     private var mWeightEditText: EditText?=null
@@ -30,14 +34,14 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
 
     private val mTouchListener:View.OnTouchListener= View.OnTouchListener { view, motionEvent ->
         mPetHasChanged=true
-        false
+        return@OnTouchListener false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
 
-        val intent:Intent=getIntent()
+        val intent:Intent= intent
         mCurrentPetUri=intent.data
 
         if(mCurrentPetUri==null){
@@ -46,7 +50,7 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
             invalidateOptionsMenu()
         }else{
             title=getString(R.string.editor_activity_title_edit_pet)
-//            loaderManager.initLoader(EXISTING_PET_LOADER,null,this)
+            supportLoaderManager.initLoader(EXISTING_PET_LOADER,null,this)
         }
 
         mNameEditText= findViewById(R.id.edit_pet_name)
@@ -154,9 +158,6 @@ public class EditorActivity: AppCompatActivity(), LoaderManager.LoaderCallbacks<
         return super.onOptionsItemSelected(item)
     }
 
-    companion object {
-        private const val EXISTING_PET_LOADER=0
-    }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         super.onPrepareOptionsMenu(menu)

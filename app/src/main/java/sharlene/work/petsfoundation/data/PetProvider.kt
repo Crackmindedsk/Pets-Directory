@@ -7,8 +7,6 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
-import sharlene.work.petsfoundation.data.PetContract
-import sharlene.work.petsfoundation.data.PetDbHelper
 
 
 class PetProvider: ContentProvider() {
@@ -89,15 +87,15 @@ class PetProvider: ContentProvider() {
         if(weight!=null && weight<0)
             throw IllegalArgumentException("Pet requires a weight")
 
-        val db= mDbHelper!!.writableDatabase
+        val db= mDbHelper?.writableDatabase
 
-        val newRowId=db.insert(PetContract.PetEntry.TABLE_NAME,null,values)
+        val newRowId=db?.insert(PetContract.PetEntry.TABLE_NAME,null,values)
         if(newRowId==-1L){
             Log.d("PetProvider","Failed to insert row for $uri")
             return null
         }
         context?.contentResolver?.notifyChange(uri,null)
-        return ContentUris.withAppendedId(uri,newRowId)
+        return ContentUris.withAppendedId(uri, newRowId!!)
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
